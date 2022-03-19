@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "RoyalTravels",
+    "slug": "RoyalTravels",
+    "privacy": "public",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.RoyalTravels.RoyalTravels",
+      "supportsTablet": true
+    },
+    "description": "",
+    "android": {
+      "package": "com.RoyalTravels.RoyalTravels",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDSvqFVfMDtPftyvZJMrEYeqF5R5dXc6nE"
+        }
+      }
+    },
+    "entryPoint": "node_modules/expo/AppEntry.js"
+  }
+}
