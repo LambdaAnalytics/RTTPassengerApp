@@ -4,11 +4,12 @@ import {
     Dimensions, Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableHighlight,
     View, StatusBar, Button, AsyncStorage, FlatList, ActivityIndicator, TouchableNativeFeedback
 } from 'react-native';
-import { Header, Left, Container, Body, Title, Right, Icon, Content, Input, Item, Card, DatePicker, Label } from "native-base";
+import { Header, Left, Container, Body, Title, Right, Icon, Content, Input, Item, Card, DatePicker, Label,Alert } from "native-base";
 import { connect } from "react-redux";
 import { userRequestLogout, fetchBookingList, getPaymentAmtForTrip, SendPaymentID } from "../actions";
 import { MaterialIcons } from '@expo/vector-icons';
 import RazorpayCheckout from 'react-native-razorpay';
+import Modal from 'react-native-modal-patch';
 
 // const extractKey = ({ JourneyDate }) => JourneyDate + "";
 const extractKey = ({ }) => Math.random().toString(36).substring(7);
@@ -19,6 +20,14 @@ class BookingScreen3 extends React.Component {
     static navigationOptions = {
         headerShown: false
     };
+    state = {
+    modalVisible: false
+  };
+
+  setModalVisible(visible) {
+    this.setState({ modalVisible: visible });
+  }
+
 
     /* static navigationOptions = {
       title: 'Details',
@@ -45,7 +54,8 @@ class BookingScreen3 extends React.Component {
         super(props);
         this.state = {
             isRefreshing: false,
-            isPaymentInProgress : false,
+            isPaymentInProgress: false,
+            
         }
     }
 
@@ -68,6 +78,7 @@ class BookingScreen3 extends React.Component {
 
         if (Platform.OS === 'android') {
             return (
+                
                 <TouchableNativeFeedback
                     background={TouchableNativeFeedback.Ripple('#CA6C39')}
                     delayPressIn={0}
@@ -353,7 +364,8 @@ class BookingScreen3 extends React.Component {
 
                         { item.PaymentStatus == false &&
                             
-                              <TouchableHighlight onPress={this.onTripAmtPayment.bind(this, item)}>
+                           //   <TouchableHighlight onPress={this.onTripAmtPayment.bind(this, item)}>
+                               <TouchableHighlight onPress={this.renderModalPopUp.bind(this, item)}> 
                                <View style={styles.button}>
                               <Text style={{ textAlign: 'center', fontSize: 15, fontWeight: '900', flex: 1 }}>PAY NOW</Text>
                       
@@ -376,14 +388,33 @@ class BookingScreen3 extends React.Component {
         }
     }
 
+    renderModalPopUp = (tripDetails) => {
+       
+        this.setModalVisible(true);
+        console.log(" tripDetails ",tripDetails);
+        return (
+            <View style={styles.centeredView}>
+             <Modal
+                animationType="slide"
+                presentationStyle="pageSheet" // <-- Swipe down/dismiss works now!
+                visible={this.state.modalVisible}
+                onDismiss={() => this.setModalVisible(false)} // <-- This gets called all the time
+                >
+                {" I am going to Bangalore "}
+            </Modal>
+            </View>
+        );
+    }
 
     onTripAmtPayment = (tripDetails) => {
         this.setState({
         isPaymentInProgress : true });
        
-       this.props.getPaymentAmtForTrip({ "tripId": tripDetails.BookingId }).then((data) => {
-        
-         if (data.Status == 200) {
+        this.props.getPaymentAmtForTrip({ "tripId": tripDetails.BookingId }).then((data) => {
+             
+           
+
+        if (data.Status == 200) {
         //  this.resetAllFields();
         //  this.props.navigation.navigate("My Bookings");
          
@@ -392,13 +423,13 @@ class BookingScreen3 extends React.Component {
             image: 'https://app.royaltour.in/images/rtt_pg_logo.jpg',
             currency: 'INR',
             key: data.TripPaymentAmtDtls.rpkid,  
-            amount: '5',
+            amount: data.TripPaymentAmtDtls.Amount,
             name: 'Royal Tours & Travels',
             order_id: data.TripPaymentAmtDtls.Order_Id,//Replace this with an order_id created using Orders API. Learn more at https://razorpay.com/docs/api/orders.
             prefill: {
             //  email: 'amarshotmail@gmail.com',
             //  contact: '7892419603',
-              name: 'Vinayak Royal'
+            name: 'Vinayak Royal'
             },
             theme: {color: '#53a20e'}
           }
@@ -672,7 +703,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#fff'
 
-      },
+    },
+    centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
     container: {
         flex: 1,
         // paddingTop: 15,
